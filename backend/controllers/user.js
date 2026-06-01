@@ -9,7 +9,7 @@ import bcrypt from "bcrypt"
 import crypto  from "crypto"
 import sendMail from "../config/sendmail.js";
 import { getOtpHtml, getVerifyEmailHtml } from "../config/html.js";
-import { generateToken } from "../config/generateToken.js";
+import { generateAccessToken, generateToken, verifyRefreshToken } from "../config/generateToken.js";
 
 export const registerUser = TryCatch(async(req,res) => {
     const sanitizedBody = sanitize(req.body)
@@ -242,5 +242,36 @@ export const verifyOtp = TryCatch(async(req,res)=> {
         user,
     });
 
+
+});
+
+export const myProfile = TryCatch(async(req,res)=> {
+    const user = req.user;
+
+    res.json(user);
+})
+
+export const refreshToken = TryCatch(async(req,res)=>{
+    const refreshToken = req.cookies.refreshToken;
+
+    if(!refreshToken){
+        return res.status(401).json({
+            message:"Invalid refresh Token",
+        });
+    }
+
+    const decode = await verifyRefreshToken(refreshToken)
+
+    if(!decode){
+        return res.status(401).json({
+            message:"invalid refresh Token",
+        });
+    }
+
+    generateAccessToken(decode.id,res);
+
+    res.status(200).json({
+        message:"token refreshed",
+    });
 
 });
