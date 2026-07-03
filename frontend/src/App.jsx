@@ -3,6 +3,7 @@ import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './pages/Login';
  import { ToastContainer, toast } from 'react-toastify';
+import VerifyOTP from './pages/VerifyOTP';
 
 const App = () => {
   return <>
@@ -10,6 +11,7 @@ const App = () => {
   <Routes>
     <Route path='/' element={<Home/>}/>
     <Route path='/login' element={<Login/>}/>
+    <Route path='/verifyotp' element={<VerifyOTP/>}/>
 
 
   </Routes>

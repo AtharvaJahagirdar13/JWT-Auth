@@ -1,25 +1,46 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import axios from 'axios';
+import { server } from '../main';
 
 const Login = () => {
   const [email,setEmail]= useState("");
   const [password, setPassword] = useState("");
+  const [btnLoading,setBtnLoading] = useState(false);
+
+  const navigate = useNavigate()
 
   const submitHandler = async (e) => {
+    setBtnLoading(true);
     e.preventDefault();
+    
     try {
-      const {data} = await axios.post(`${server}/api/v1/login`)
-      toast.success(data.message);
-    } catch (error) {
-      toast.error(error.response.data.message)
       
+      const { data } = await axios.post(`${server}/api/v1/login`, {
+        email,
+        password,
+      });
+      toast.success(data.message);
+      localStorage.setItem("email", email);
+      navigate("/verifyotp");
+    } catch (error) {
+  toast.error(
+    error.response?.data?.error?.[0]?.message ||
+    error.response?.data?.message?.message ||
+    error.message ||
+    "Something went wrong"
+  );
+}
+finally{
+      setBtnLoading(false);
     }
 
   }
 
   return (
-    <div><section className="text-gray-600 body-font">
+    <div>
+      <section className="text-gray-600 body-font">
   <div className="container px-5 py-24 mx-auto flex flex-wrap items-center">
     <div className="lg:w-3/5 md:w-1/2 md:pr-16 lg:pr-0 pr-0">
       <h1 className="title-font font-medium text-3xl text-gray-900">Slow-carb next level shoindcgoitch ethical authentic, poko scenester</h1>
@@ -49,7 +70,7 @@ const Login = () => {
         required
         />
       </div>
-      <button className="text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">Button</button>
+      <button className="text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg" disabled={btnLoading}>{btnLoading ? "submitting..." : "Login"}</button>
       <Link to={"/register"} className="text-xs text-gray-500 mt-3">Dont have an account?  </Link>
     </form>
   </div>
